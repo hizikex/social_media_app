@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/users', userRoutes);
-app.use('/follows', followRoutes);
+app.use('/follows', followRoutes)
 
 app.listen(PORT, async () => {
     await connection()

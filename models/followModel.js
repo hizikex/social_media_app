@@ -16,7 +16,7 @@ Follow.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: 'users',
+        model: 'users', // Table name should match exactly
         key: 'id'
       }
     },

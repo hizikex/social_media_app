@@ -10,12 +10,11 @@ exports.followUser = async (req, res) => {
                 message: "You cannot follow yourself"
             });
         }
-
         const follower = await Follow.findOne({
             where: {
                 follower_id,
                 following_id
-            }
+            },
         });
 
         if (follower) {
@@ -83,7 +82,7 @@ exports.userFollowers = async (req, res) => {
             },
             include: [{
                 model: User,
-                as: "follower",
+                as: "following",
                 attributes: ["id", "fullname", "email"]
             }],
         });
@@ -107,7 +106,7 @@ exports.userFollowings = async (req, res) => {
             },
             include: [{
                 model: User,
-                as: "following",
+                as: "follower",
                 attributes: ["id", "fullname", "email"]
             }],
         });
@@ -125,34 +124,23 @@ exports.userFollowings = async (req, res) => {
 
 exports.getMutualFollowers = async (req, res) => {
     try {
-        const { follower_id, following_id } = req.params;
-        const user1follower = await Follow.findAll({
-            attributes:  ["follower_id"],
+        const { follower_id, following_id } = req.params;;
+        const followers = await Follow.findAll({
             where: {
-                following_id: follower_id
-            }
+                [Sequelize.Op.or]: [
+                    { follower_id, following_id },
+                    { follower_id: following_id, following_id: follower_id }
+                ]
+            },
+            include: [{
+                model: User,
+                as: "follower",
+                attributes: ["id", "fullname", "email"]
+            }],
         });
-
-        const user2follower = await Follow.findAll({
-            attributes:  ["follower_id"],
-            where: {
-                following_id: following_id
-            }
-        });
-
-        const user1followerIds = user1follower.map(follow => follow.follower_id);
-        const user2followerIds = user2follower.map(follow => follow.follower_id);
-        const mutualFollowerIds = user1followerIds.filter(followerId => user2followerIds.includes(followerId));
-
-        const mutualFollowers = await User.findAll({
-            where: {
-                id: mutualFollowerIds
-            }
-        });
-
         res.status(200).json({
             message: "Mutual followers fetched successfully",
-            data: mutualFollowers
+            data: followers
         });
     } catch (error) {
         res.status(500).json({
