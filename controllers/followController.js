@@ -143,13 +143,11 @@ exports.getMutualFollowers = async (req, res) => {
         const user1followerIds = user1follower.map(follow => follow.follower_id);
         const user2followerIds = user2follower.map(follow => follow.follower_id);
         const mutualFollowerIds = user1followerIds.filter(followerId => user2followerIds.includes(followerId));
-
         const mutualFollowers = await User.findAll({
             where: {
                 id: mutualFollowerIds
             }
         });
-
         res.status(200).json({
             message: "Mutual followers fetched successfully",
             data: mutualFollowers
