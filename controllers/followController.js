@@ -127,17 +127,17 @@ exports.getMutualFollowers = async (req, res) => {
     try {
         const { follower_id, following_id } = req.params;
         const user1follower = await Follow.findAll({
-            attributes:  ["follower_id"],
             where: {
                 following_id: follower_id
-            }
+            },
+            attributes:  ["follower_id"]
         });
 
         const user2follower = await Follow.findAll({
-            attributes:  ["follower_id"],
             where: {
                 following_id: following_id
-            }
+            },
+            attributes:  ["follower_id"]
         });
 
         const user1followerIds = user1follower.map(follow => follow.follower_id);
